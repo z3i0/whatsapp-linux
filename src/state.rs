@@ -42,6 +42,7 @@ pub struct AppState {
     pub notified_messages: Mutex<Vec<(String, Instant)>>,
     pub last_top_snippet: Mutex<String>,
     pub pending_chat_target: Mutex<Option<(String, Instant)>>,
+    #[allow(dead_code)]
     pub icon_path: PathBuf,
     pub app_handle: Mutex<Option<AppHandle>>,
 }

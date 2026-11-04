@@ -12,22 +12,26 @@
         } catch(e) {}
     }
 
-    const safariUA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15";
-    spoofProp(navigator, 'vendor', 'Apple Computer, Inc.');
-    spoofProp(Navigator.prototype, 'vendor', 'Apple Computer, Inc.');
-    spoofProp(navigator, 'platform', 'MacIntel');
-    spoofProp(Navigator.prototype, 'platform', 'MacIntel');
-    spoofProp(navigator, 'userAgent', safariUA);
-    spoofProp(Navigator.prototype, 'userAgent', safariUA);
-    spoofProp(navigator, 'appVersion', '5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15');
-    spoofProp(Navigator.prototype, 'appVersion', '5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15');
-    spoofProp(navigator, 'maxTouchPoints', 0);
-    spoofProp(Navigator.prototype, 'maxTouchPoints', 0);
+    // On Windows, WebView2 is Chromium/Edge so we preserve native identity and window.chrome
+    const isWindows = typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.includes('Windows');
+    if (!isWindows) {
+        const safariUA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15";
+        spoofProp(navigator, 'vendor', 'Apple Computer, Inc.');
+        spoofProp(Navigator.prototype, 'vendor', 'Apple Computer, Inc.');
+        spoofProp(navigator, 'platform', 'MacIntel');
+        spoofProp(Navigator.prototype, 'platform', 'MacIntel');
+        spoofProp(navigator, 'userAgent', safariUA);
+        spoofProp(Navigator.prototype, 'userAgent', safariUA);
+        spoofProp(navigator, 'appVersion', '5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15');
+        spoofProp(Navigator.prototype, 'appVersion', '5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15');
+        spoofProp(navigator, 'maxTouchPoints', 0);
+        spoofProp(Navigator.prototype, 'maxTouchPoints', 0);
 
-    // Remove Blink-only properties so WhatsApp executes clean WebKit code paths
-    try { delete window.chrome; } catch(e) {}
-    try { delete navigator.userAgentData; } catch(e) {}
-    try { delete Navigator.prototype.userAgentData; } catch(e) {}
+        // Remove Blink-only properties so WhatsApp executes clean WebKit code paths
+        try { delete window.chrome; } catch(e) {}
+        try { delete navigator.userAgentData; } catch(e) {}
+        try { delete Navigator.prototype.userAgentData; } catch(e) {}
+    }
 
     // 2. High-quality Emoji & Performance Styles
     function injectPerformanceStyles() {
@@ -828,8 +832,8 @@
                 /* Standalone Floating Features Pill */
                 .wa-feat-pill {
                     position: fixed;
-                    bottom: 24px;
-                    left: 24px;
+                    bottom: 22px;
+                    left: 78px;
                     display: inline-flex;
                     align-items: center;
                     gap: 7px;
@@ -846,6 +850,7 @@
                     font-weight: 500;
                     user-select: none;
                     -webkit-user-select: none;
+                    touch-action: none;
                     transition: background 0.12s ease;
                 }
                 .wa-feat-pill:hover {
@@ -1357,12 +1362,15 @@
             document.body.appendChild(btn);
         }
 
-        let modalCreated = false;
         function createModal() {
-            if (modalCreated || document.getElementById('wa-modal-backdrop')) return;
-            modalCreated = true;
+            let backdrop = document.getElementById('wa-modal-backdrop');
+            if (backdrop && document.body && document.body.contains(backdrop)) {
+                return backdrop;
+            }
+            if (backdrop) backdrop.remove();
+            if (!document.body) return null;
 
-            const backdrop = document.createElement('div');
+            backdrop = document.createElement('div');
             backdrop.id = 'wa-modal-backdrop';
             backdrop.className = 'wa-modal-backdrop';
             backdrop.innerHTML = `
@@ -1473,7 +1481,8 @@
             backdrop.addEventListener('click', (e) => {
                 if (e.target === backdrop) closeFeaturesModal();
             });
-            document.getElementById('wa-modal-close-btn').addEventListener('click', closeFeaturesModal);
+            const closeBtn = document.getElementById('wa-modal-close-btn');
+            if (closeBtn) closeBtn.addEventListener('click', closeFeaturesModal);
 
             // Helper to update badge
             function updateBadgeState() {
@@ -1551,12 +1560,13 @@
                     downloadActiveStory();
                 });
             }
+
+            return backdrop;
         }
 
         window.__wa_open_features = function() {
             injectFeatureStyles();
-            createModal();
-            const backdrop = document.getElementById('wa-modal-backdrop');
+            const backdrop = createModal() || document.getElementById('wa-modal-backdrop');
             if (backdrop) {
                 // If a story is currently active, show the quick download button
                 const quickDl = document.getElementById('wa-quick-dl-container');
@@ -1564,6 +1574,7 @@
                     const activeMedia = getActiveStatusMedia();
                     quickDl.style.display = activeMedia ? 'block' : 'none';
                 }
+                syncWhatsAppTheme();
                 backdrop.classList.add('open');
             }
         };
@@ -1578,7 +1589,11 @@
         });
 
         function attachFloatingPill() {
-            if (!document.body || document.getElementById('wa-features-pill')) return;
+            if (!document.body) return;
+            const existing = document.getElementById('wa-features-pill');
+            if (existing && document.body.contains(existing)) return;
+            if (existing) existing.remove();
+
             injectFeatureStyles();
             createModal();
 
@@ -1596,23 +1611,66 @@
                 <span class="wa-feat-badge ${(window.__wa_stealth_story || window.__wa_stealth_messages || window.__wa_story_downloader) ? 'active' : ''}"></span>
             `;
 
-            // Restore saved position if available
+            // Restore saved position if available and within screen bounds
             try {
                 const savedPos = JSON.parse(localStorage.getItem('wa_feat_btn_pos'));
                 if (savedPos && savedPos.left && savedPos.top) {
-                    pill.style.left = savedPos.left;
-                    pill.style.top = savedPos.top;
-                    pill.style.bottom = 'auto';
-                    pill.style.right = 'auto';
+                    const l = parseInt(savedPos.left, 10);
+                    const t = parseInt(savedPos.top, 10);
+                    const maxW = Math.max(200, (window.innerWidth || 1100) - 100);
+                    const maxH = Math.max(200, (window.innerHeight || 750) - 50);
+                    if (!isNaN(l) && !isNaN(t) && l >= 0 && l <= maxW && t >= 0 && t <= maxH) {
+                        pill.style.left = l + 'px';
+                        pill.style.top = t + 'px';
+                        pill.style.bottom = 'auto';
+                        pill.style.right = 'auto';
+                    }
                 }
             } catch(e) {}
 
-            // Dragging logic
+            // Pointer-based dragging and click logic (works for mouse, trackpad, and touch)
             let isDragging = false;
-            let startX, startY, initialLeft, initialTop;
+            let dragMoved = false;
+            let startX = 0, startY = 0, initialLeft = 0, initialTop = 0;
 
-            pill.addEventListener('mousedown', function(e) {
+            function onPointerMove(ev) {
+                const dx = ev.clientX - startX;
+                const dy = ev.clientY - startY;
+                if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
+                    dragMoved = true;
+                    isDragging = true;
+                    const newX = Math.max(12, Math.min(window.innerWidth - pill.offsetWidth - 12, initialLeft + dx));
+                    const newY = Math.max(12, Math.min(window.innerHeight - pill.offsetHeight - 12, initialTop + dy));
+                    pill.style.left = newX + 'px';
+                    pill.style.top = newY + 'px';
+                    pill.style.bottom = 'auto';
+                    pill.style.right = 'auto';
+                }
+            }
+
+            function onPointerUp(ev) {
+                document.removeEventListener('pointermove', onPointerMove);
+                document.removeEventListener('pointerup', onPointerUp);
+                if (dragMoved) {
+                    try {
+                        localStorage.setItem('wa_feat_btn_pos', JSON.stringify({
+                            left: pill.style.left,
+                            top: pill.style.top
+                        }));
+                    } catch(e) {}
+                    setTimeout(() => {
+                        isDragging = false;
+                        dragMoved = false;
+                    }, 80);
+                } else {
+                    isDragging = false;
+                    dragMoved = false;
+                }
+            }
+
+            pill.addEventListener('pointerdown', function(e) {
                 if (e.button !== 0) return;
+                dragMoved = false;
                 isDragging = false;
                 startX = e.clientX;
                 startY = e.clientY;
@@ -1620,39 +1678,12 @@
                 initialLeft = rect.left;
                 initialTop = rect.top;
 
-                function onMouseMove(ev) {
-                    const dx = ev.clientX - startX;
-                    const dy = ev.clientY - startY;
-                    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
-                        isDragging = true;
-                        const newX = Math.max(12, Math.min(window.innerWidth - pill.offsetWidth - 12, initialLeft + dx));
-                        const newY = Math.max(12, Math.min(window.innerHeight - pill.offsetHeight - 12, initialTop + dy));
-                        pill.style.left = newX + 'px';
-                        pill.style.top = newY + 'px';
-                        pill.style.bottom = 'auto';
-                        pill.style.right = 'auto';
-                    }
-                }
-
-                function onMouseUp(ev) {
-                    document.removeEventListener('mousemove', onMouseMove);
-                    document.removeEventListener('mouseup', onMouseUp);
-                    if (isDragging) {
-                        try {
-                            localStorage.setItem('wa_feat_btn_pos', JSON.stringify({
-                                left: pill.style.left,
-                                top: pill.style.top
-                            }));
-                        } catch(e) {}
-                    }
-                }
-
-                document.addEventListener('mousemove', onMouseMove);
-                document.addEventListener('mouseup', onMouseUp);
+                document.addEventListener('pointermove', onPointerMove);
+                document.addEventListener('pointerup', onPointerUp);
             });
 
             pill.addEventListener('click', function(e) {
-                if (isDragging) {
+                if (isDragging || dragMoved) {
                     e.preventDefault();
                     e.stopPropagation();
                     return;
@@ -1717,11 +1748,34 @@
             setTimeout(scanAndPatchAllModules, 50);
         }, true);
 
-        // Attach floating pill efficiently after page load
+        // Keep floating pill reliably attached across SPA page re-renders, WhatsApp load stages, and dynamic DOM updates
         attachFloatingPill();
         window.addEventListener('DOMContentLoaded', attachFloatingPill);
         window.addEventListener('load', attachFloatingPill);
+        setTimeout(attachFloatingPill, 1000);
         setTimeout(attachFloatingPill, 2500);
-        setTimeout(attachFloatingPill, 6000);
+        setTimeout(attachFloatingPill, 5000);
+
+        if (window.MutationObserver) {
+            const pillObserver = new MutationObserver(() => {
+                if (document.body && !document.getElementById('wa-features-pill')) {
+                    attachFloatingPill();
+                }
+            });
+            if (document.body) {
+                pillObserver.observe(document.body, { childList: true });
+            } else {
+                window.addEventListener('DOMContentLoaded', () => {
+                    if (document.body) pillObserver.observe(document.body, { childList: true });
+                });
+            }
+        }
+
+        // Heartbeat watchdog (every 2.5s) to guarantee pill remains in DOM under all circumstances
+        setInterval(() => {
+            if (document.body && !document.getElementById('wa-features-pill')) {
+                attachFloatingPill();
+            }
+        }, 2500);
     })();
 })();

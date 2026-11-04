@@ -1,20 +1,23 @@
 (function() {
-    // 1. WebKit/Safari identity: Matches underlying WebKitGTK engine so WhatsApp Web
+    // Only run UI injection in the top-level main window, never inside hidden subframes
+    if (typeof window !== 'undefined' && window.top !== window.self) return;
+
+    // 1. WebKit/Safari identity: Matches underlying WebKitGTK engine on Linux so WhatsApp Web
     // serves its WebKit-tested code path. This fixes missing/unloaded emojis, animated stickers,
     // and layout/spritesheet scaling issues that fail under Chrome/Blink spoofing.
-    function spoofProp(obj, prop, val) {
-        try {
-            Object.defineProperty(obj, prop, {
-                get: function() { return val; },
-                configurable: true,
-                enumerable: true
-            });
-        } catch(e) {}
-    }
-
-    // On Windows, WebView2 is Chromium/Edge so we preserve native identity and window.chrome
-    const isWindows = typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.includes('Windows');
+    // On Windows, WebView2 is native Chromium/Edge, so we do not spoof Safari or delete window.chrome.
+    const isWindows = (typeof window !== 'undefined' && window.__WA_PLATFORM__ === 'windows') ||
+                      (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.includes('Windows'));
     if (!isWindows) {
+        function spoofProp(obj, prop, val) {
+            try {
+                Object.defineProperty(obj, prop, {
+                    get: function() { return val; },
+                    configurable: true,
+                    enumerable: true
+                });
+            } catch(e) {}
+        }
         const safariUA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.6 Safari/605.1.15";
         spoofProp(navigator, 'vendor', 'Apple Computer, Inc.');
         spoofProp(Navigator.prototype, 'vendor', 'Apple Computer, Inc.');
@@ -742,7 +745,7 @@
                 };
 
                 chunk.push([
-                    [Symbol('wa-stealth-capture')],
+                    ['wa-stealth-capture'],
                     {},
                     function(r) {
                         capturedWebpackRequire = r;
@@ -1564,6 +1567,7 @@
             return backdrop;
         }
 
+        window.__wa_attach_pill = attachFloatingPill;
         window.__wa_open_features = function() {
             injectFeatureStyles();
             const backdrop = createModal() || document.getElementById('wa-modal-backdrop');
@@ -1600,10 +1604,10 @@
             let pill = document.createElement('div');
             pill.id = 'wa-features-pill';
             pill.className = 'wa-feat-pill';
-            pill.setAttribute('title', 'WhatsApp Features & Privacy (Drag to move)');
+            pill.setAttribute('title', 'WhatsApp Features & Privacy (Click to open, Drag to move)');
             pill.innerHTML = `
                 <span class="wa-feat-pill-icon">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                     </svg>
                 </span>
@@ -1611,19 +1615,41 @@
                 <span class="wa-feat-badge ${(window.__wa_stealth_story || window.__wa_stealth_messages || window.__wa_story_downloader) ? 'active' : ''}"></span>
             `;
 
+            // Ensure bulletproof fixed positioning and maximum z-index directly on element
+            pill.style.setProperty('position', 'fixed', 'important');
+            pill.style.setProperty('bottom', '24px', 'important');
+            pill.style.setProperty('left', '80px', 'important');
+            pill.style.setProperty('z-index', '2147483647', 'important');
+            pill.style.setProperty('display', 'inline-flex', 'important');
+            pill.style.setProperty('align-items', 'center', 'important');
+            pill.style.setProperty('gap', '8px', 'important');
+            pill.style.setProperty('padding', '8px 16px', 'important');
+            pill.style.setProperty('border-radius', '24px', 'important');
+            pill.style.setProperty('cursor', 'pointer', 'important');
+            pill.style.setProperty('font-family', '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', 'important');
+            pill.style.setProperty('font-size', '13px', 'important');
+            pill.style.setProperty('font-weight', '600', 'important');
+            pill.style.setProperty('line-height', 'normal', 'important');
+            pill.style.setProperty('visibility', 'visible', 'important');
+            pill.style.setProperty('opacity', '1', 'important');
+            pill.style.setProperty('pointer-events', 'auto', 'important');
+            pill.style.setProperty('user-select', 'none', 'important');
+            pill.style.setProperty('-webkit-user-select', 'none', 'important');
+            pill.style.setProperty('touch-action', 'none', 'important');
+
             // Restore saved position if available and within screen bounds
             try {
                 const savedPos = JSON.parse(localStorage.getItem('wa_feat_btn_pos'));
                 if (savedPos && savedPos.left && savedPos.top) {
                     const l = parseInt(savedPos.left, 10);
                     const t = parseInt(savedPos.top, 10);
-                    const maxW = Math.max(200, (window.innerWidth || 1100) - 100);
+                    const maxW = Math.max(200, (window.innerWidth || 1100) - 120);
                     const maxH = Math.max(200, (window.innerHeight || 750) - 50);
-                    if (!isNaN(l) && !isNaN(t) && l >= 0 && l <= maxW && t >= 0 && t <= maxH) {
-                        pill.style.left = l + 'px';
-                        pill.style.top = t + 'px';
-                        pill.style.bottom = 'auto';
-                        pill.style.right = 'auto';
+                    if (!isNaN(l) && !isNaN(t) && l >= 10 && l <= maxW && t >= 10 && t <= maxH) {
+                        pill.style.setProperty('left', l + 'px', 'important');
+                        pill.style.setProperty('top', t + 'px', 'important');
+                        pill.style.setProperty('bottom', 'auto', 'important');
+                        pill.style.setProperty('right', 'auto', 'important');
                     }
                 }
             } catch(e) {}
@@ -1704,7 +1730,20 @@
             const backdrop = document.getElementById('wa-modal-backdrop');
             if (backdrop) backdrop.setAttribute('data-theme', isDark ? 'dark' : 'light');
             const pill = document.getElementById('wa-features-pill');
-            if (pill) pill.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            if (pill) {
+                pill.setAttribute('data-theme', isDark ? 'dark' : 'light');
+                if (isDark) {
+                    pill.style.setProperty('background', '#202c33', 'important');
+                    pill.style.setProperty('color', '#e9edef', 'important');
+                    pill.style.setProperty('border', '1px solid #374248', 'important');
+                    pill.style.setProperty('box-shadow', '0 4px 16px rgba(0, 0, 0, 0.45)', 'important');
+                } else {
+                    pill.style.setProperty('background', '#ffffff', 'important');
+                    pill.style.setProperty('color', '#111b21', 'important');
+                    pill.style.setProperty('border', '1px solid #d1d7db', 'important');
+                    pill.style.setProperty('box-shadow', '0 3px 12px rgba(11, 20, 26, 0.18)', 'important');
+                }
+            }
         }
 
         if (window.MutationObserver) {

@@ -14,6 +14,13 @@ pub fn build_main_window(
     state: Arc<AppState>,
     profile_dir: PathBuf,
 ) -> Result<WebviewWindow, Box<dyn std::error::Error>> {
+    #[cfg(target_os = "windows")]
+    let platform_script = "window.__WA_PLATFORM__ = 'windows';";
+    #[cfg(target_os = "macos")]
+    let platform_script = "window.__WA_PLATFORM__ = 'macos';";
+    #[cfg(target_os = "linux")]
+    let platform_script = "window.__WA_PLATFORM__ = 'linux';";
+
     let window = WebviewWindowBuilder::new(
         app,
         "main",
@@ -25,9 +32,10 @@ pub fn build_main_window(
     .center()
     .user_agent(USER_AGENT)
     .data_directory(profile_dir)
+    .initialization_script(platform_script)
     .initialization_script(INIT_SCRIPT)
     .enable_clipboard_access()
-    .devtools(cfg!(debug_assertions))
+    .devtools(true)
     .build()?;
 
     debug_log("=== WhatsApp Linux started ===");

@@ -15,6 +15,13 @@
     window.__wa_pending_notifs = [];
     window.__wa_sound_played = false;
 
+    // Ensure Features Pill is actively attached on live page
+    try {
+        if (!document.getElementById('wa-features-pill') && typeof window.__wa_attach_pill === 'function') {
+            window.__wa_attach_pill();
+        }
+    } catch(e) {}
+
     function toInt(str) {
         if (!str) return 0;
         let s = str.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));

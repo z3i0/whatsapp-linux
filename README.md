@@ -2,17 +2,17 @@
 
 <img src="assets/icon.png" alt="WhatsApp Desktop Logo" width="128" height="128" style="margin-bottom: 16px; border-radius: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.25);" />
 
-# WhatsApp Desktop for Linux
+# WhatsApp Desktop for Linux (Unofficial)
 
-**Next-generation, ultra-lightweight, and privacy-hardened WhatsApp desktop client.**  
+**Next-generation, ultra-lightweight, and privacy-hardened desktop client for WhatsApp Web.**  
 *Crafted with Rust and Tauri 2 for optimal speed, minimal memory usage, and seamless OS integration.*
 
 [![Release](https://img.shields.io/github/v/release/whatsapp-linux/whatsapp-linux?style=for-the-badge&logo=github&color=25D366&logoColor=white)](https://github.com/whatsapp-linux/whatsapp-linux/releases)
+[![Unofficial](https://img.shields.io/badge/Type-Unofficial%20Client-ff5722?style=for-the-badge&logo=whatsapp&logoColor=white)](#-disclaimer)
 [![Rust](https://img.shields.io/badge/Rust-1.75%2B-orange?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 [![Tauri](https://img.shields.io/badge/Tauri-v2.0-24C8D8?style=for-the-badge&logo=tauri&logoColor=white)](https://tauri.app/)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20|%20macOS%20|%20Windows-blue?style=for-the-badge&logo=linux&logoColor=white)](https://github.com/whatsapp-linux/whatsapp-linux)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=open-source-initiative&logoColor=white)](LICENSE)
-[![CI Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white)](#)
 
 <p align="center">
   <a href="#-key-features">Key Features</a> •
@@ -29,11 +29,14 @@
 
 </div>
 
+> [!IMPORTANT]
+> **Unofficial Community Client**: This application is an independent, open-source project and is **not an official WhatsApp product**. It is not affiliated with, maintained, authorized, or endorsed by WhatsApp LLC, Meta Platforms, Inc., or any of their subsidiaries. All trademarks belong to their respective owners.
+
 ## 📖 Overview
 
-Most desktop WhatsApp alternatives on Linux are packaged as bloated Electron wrappers that consume 600MB–1.2GB of RAM, lag during heavy typing, and fail to integrate cleanly with Linux system trays and desktop notifications.
+Most third-party desktop WhatsApp alternatives on Linux are packaged as bloated Electron wrappers that consume 600MB–1.2GB of RAM, lag during heavy typing, and fail to integrate cleanly with Linux system trays and desktop notifications.
 
-**WhatsApp Desktop for Linux** solves this by leveraging **Rust** and **Tauri 2**. Utilizing native platform web engines (`WebKitGTK` on Linux, `WebKit` on macOS, and `WebView2` on Windows), it delivers blazing speed with **less than 100MB idle RAM**, instant startup, hardware-accelerated rendering, and exclusive enhancements including **Stealth Privacy Modes** and **1-Click Story Media Downloads**.
+**WhatsApp Desktop for Linux (Unofficial)** solves this by leveraging **Rust** and **Tauri 2**. Utilizing native platform web engines (`WebKitGTK` on Linux, `WebKit` on macOS, and `WebView2` on Windows), it delivers blazing speed with **less than 100MB idle RAM**, instant startup, hardware-accelerated rendering, and exclusive enhancements including **Stealth Privacy Modes** and **1-Click Story Media Downloads**.
 
 ---
 
@@ -332,13 +335,15 @@ Contributions, bug reports, and suggestions are warmly welcome!
 
 ## 🛡️ Disclaimer
 
-This is an open-source, third-party desktop client. It is **not** endorsed by, directly affiliated with, maintained, authorized, or sponsored by WhatsApp LLC, Meta Platforms, Inc., or any of their affiliates or subsidiaries.
+This application is an **unofficial, open-source, third-party desktop client**. It is **not** endorsed by, directly affiliated with, maintained, authorized, or sponsored by WhatsApp LLC, Meta Platforms, Inc., or any of their affiliates or subsidiaries.
 
-- WhatsApp and the WhatsApp logo are registered trademarks of WhatsApp LLC / Meta Platforms, Inc.
-- Use of this software complies with open-source fair-use principles.
+- "WhatsApp" and associated names, marks, logos, and emblems are registered trademarks of WhatsApp LLC and Meta Platforms, Inc.
+- This application provides an optimized desktop container interface for [WhatsApp Web](https://web.whatsapp.com) and does not store or transmit user credentials, messages, or keys to any third-party servers.
+- Use of this software is provided under the terms of the MIT License for personal and open-source usage.
 
 ---
 
 ## 📄 License
 
 This project is licensed under the [MIT License](LICENSE) © 2026 WhatsApp Desktop Linux Contributors.
+

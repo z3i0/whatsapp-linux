@@ -1,0 +1,12 @@
+{
+  "name": "whatsapp-desktop",
+  "version": "1.0.0",
+  "description": "Cross-platform WhatsApp Desktop Client for Windows, macOS, and Linux",
+  "private": true,
+  "scripts": {
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0"
+  }
+}

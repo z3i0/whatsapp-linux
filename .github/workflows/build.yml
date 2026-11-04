@@ -39,6 +39,9 @@ jobs:
         with:
           node-version: 20
 
+      - name: Install CLI dependencies
+        run: npm install
+
       - name: Install dependencies (Ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
         run: |

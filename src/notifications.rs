@@ -63,6 +63,7 @@ pub fn show_desktop_notification(
         clean_msg
     };
 
+    #[cfg(target_os = "linux")]
     let icon_str = state.icon_path.to_string_lossy().to_string();
 
     // Store pending chat target

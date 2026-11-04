@@ -28,4 +28,6 @@ wa-debug.log
 # Backup & scratch files
 scratch/
 *.bak
+releases/
+node_modules/
 

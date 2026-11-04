@@ -1,0 +1,20 @@
+[Desktop Entry]
+Name=WhatsApp
+GenericName=WhatsApp Desktop
+Comment=Ultra-fast WhatsApp Web client for Linux built with Tauri 2 and Rust
+Exec=whatsapp-linux
+Icon=whatsapp-linux
+Terminal=false
+Type=Application
+Categories=Network;InstantMessaging;Chat;
+StartupWMClass=whatsapp-linux
+Keywords=WhatsApp;Chat;Message;InstantMessaging;
+Actions=NewWindow;Quit;
+
+[Desktop Action NewWindow]
+Name=Open WhatsApp
+Exec=whatsapp-linux
+
+[Desktop Action Quit]
+Name=Quit
+Exec=pkill -f "whatsapp-linux"

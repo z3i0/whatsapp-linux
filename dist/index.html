@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhatsApp</title>
+  <style>
+    :root {
+      --wa-bg: #111b21;
+      --wa-surface: #202c33;
+      --wa-primary: #00a884;
+      --wa-text: #e9edef;
+      --wa-subtext: #8696a0;
+      --wa-progress-bg: #2a3942;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+    body {
+      background-color: var(--wa-bg);
+      color: var(--wa-text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 360px;
+      padding: 32px 16px;
+    }
+    .icon-wrapper {
+      width: 72px;
+      height: 72px;
+      margin-bottom: 24px;
+      animation: pulse 2s infinite ease-in-out;
+    }
+    .icon-wrapper svg {
+      width: 100%;
+      height: 100%;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      color: var(--wa-text);
+      margin-bottom: 8px;
+    }
+    p {
+      font-size: 14px;
+      color: var(--wa-subtext);
+      margin-bottom: 24px;
+    }
+    .progress-bar {
+      width: 220px;
+      height: 3px;
+      background-color: var(--wa-progress-bg);
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 40%;
+      background-color: var(--wa-primary);
+      border-radius: 3px;
+      animation: progress-slide 1.5s infinite ease-in-out;
+    }
+    .encrypted {
+      margin-top: 32px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--wa-subtext);
+    }
+    .encrypted svg {
+      width: 12px;
+      height: 12px;
+      fill: currentColor;
+    }
+    @keyframes progress-slide {
+      0% {
+        left: -40%;
+      }
+      50% {
+        left: 40%;
+        width: 60%;
+      }
+      100% {
+        left: 100%;
+        width: 40%;
+      }
+    }
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.95;
+      }
+      50% {
+        transform: scale(1.04);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="icon-wrapper">
+      <svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="512" height="512" rx="120" fill="#00A884"/>
+        <path fill="#FFFFFF" d="M256 90c-91.7 0-166 74.3-166 166 0 29.3 7.6 57.9 22.1 83L88 424l87.5-23c24.2 13.2 51.5 20.2 80.5 20.2 91.7 0 166-74.3 166-166S347.7 90 256 90zm96.6 235.1c-4.1 11.5-20.3 21.1-28.2 22.4-7.4 1.2-16.9 1.7-27.4-1.7-6.4-2.1-14.7-4.9-25.2-9.5-44.5-19.3-73.4-64.2-75.6-67.2-2.2-3-18.1-24.1-18.1-46s11.5-32.6 15.6-37.1c4.1-4.5 9-5.6 12-5.6 3 0 6 .1 8.6.2 2.8.1 6.5-.9 10.2 7.9 4.1 9.7 13.9 33.9 15.1 36.4 1.2 2.5 2 5.5.4 8.7-1.6 3.2-2.5 5.2-4.9 8.1-2.5 2.9-5.2 6.5-7.4 8.7-2.5 2.5-5.1 5.2-2.2 10.2 2.9 5 12.9 21.3 27.7 34.5 19 16.9 35 22.2 40 24.6 5 2.5 7.9 2.1 10.9-1.2 3-3.4 12.8-14.9 16.3-20.1 3.4-5.2 6.9-4.3 11.5-2.6 4.6 1.7 29.3 13.8 34.3 16.3 5 2.5 8.3 3.7 9.5 5.8 1.2 2 1.2 11.9-2.9 23.4z"/>
+      </svg>
+    </div>
+    <h1>WhatsApp</h1>
+    <p>Connecting securely to WhatsApp Web...</p>
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+    </div>
+    <div class="encrypted">
+      <svg viewBox="0 0 24 24">
+        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+      </svg>
+      End-to-end encrypted
+    </div>
+  </div>
+</body>
+</html>
+

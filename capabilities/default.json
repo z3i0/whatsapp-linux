@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/crates/tauri-utils/schema.json",
+  "identifier": "default",
+  "description": "WhatsApp Web capability",
+  "windows": ["main"],
+  "remote": {
+    "urls": ["https://web.whatsapp.com*"]
+  },
+  "permissions": [
+    "core:default"
+  ]
+}
+

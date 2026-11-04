@@ -1,0 +1,26 @@
+[package]
+name = "whatsapp-linux"
+version = "1.0.0"
+description = "Fast, lightweight WhatsApp Desktop client for Linux built with Tauri 2 and Rust"
+authors = ["WhatsApp Linux"]
+edition = "2021"
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-single-instance = "2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1", features = ["sync", "time", "rt-multi-thread"] }
+chrono = "0.4"
+tauri-plugin-notification = "2"
+
+[build-dependencies]
+tauri-build = "2"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+

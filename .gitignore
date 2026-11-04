@@ -1,0 +1,30 @@
+# Rust & Cargo
+/target/
+Cargo.lock.bak
+**/*.rs.bk
+
+# Tauri build artifacts
+src-tauri/target/
+gen/schemas/
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs & temporary files
+*.log
+wa-debug.log
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Backup & scratch files
+scratch/
+*.bak
